@@ -3,6 +3,7 @@ package caddy_docker_upstreams
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"sync"
@@ -60,6 +61,7 @@ func (u *Upstreams) provisionCandidates(ctx caddy.Context, containers []types.Co
 			continue
 		}
 
+		fmt.Println(container.Labels)
 		// If there is the healtcheck label, honor it, otherwise continue
 		if healthcheck, ok := container.Labels[LabelHealthCheck]; ok && healthcheck == "true" {
 			u.logger.Info("checking container health")
