@@ -62,6 +62,7 @@ func (u *Upstreams) provisionCandidates(ctx caddy.Context, containers []types.Co
 
 		// If there is the healtcheck label, honor it, otherwise continue
 		if healthcheck, ok := container.Labels[LabelHealthCheck]; ok && healthcheck == "true" {
+			u.logger.Info("checking container health")
 			if container.State != types.Healthy {
 				u.logger.Info("container is not healthy",
 					zap.String("container_id", container.ID),
