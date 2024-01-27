@@ -22,6 +22,7 @@ import (
 const (
 	LabelEnable       = "com.caddyserver.http.enable"
 	LabelUpstreamPort = "com.caddyserver.http.upstream.port"
+	LabelHealthCheck  = "com.caddyserver.http.healthcheck"
 )
 
 func init() {
@@ -57,6 +58,18 @@ func (u *Upstreams) provisionCandidates(ctx caddy.Context, containers []types.Co
 		// Check enable.
 		if enable, ok := container.Labels[LabelEnable]; !ok || enable != "true" {
 			continue
+		}
+
+		// If there is the healtcheck label, honor it, otherwise continue
+		if healthcheck, ok := container.Labels[LabelHealthCheck]; ok && healthcheck == "true" {
+			if container.State != types.Healthy {
+				u.logger.Info("container is not healthy",
+					zap.String("container_id", container.ID),
+					zap.String("container_name", container.Names[0]),
+					zap.String("container_state", container.State),
+				)
+				continue
+			}
 		}
 
 		// Build matchers.
